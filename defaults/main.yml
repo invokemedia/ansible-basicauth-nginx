@@ -1,0 +1,4 @@
+---
+auth_username: authuser
+auth_password: mypassword
+auth_nginx_conf: /etc/nginx/sites-enabled/default

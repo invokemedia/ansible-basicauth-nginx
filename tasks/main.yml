@@ -1,0 +1,33 @@
+---
+- name: Check if nginx is installed
+  command: dpkg-query -l nginx
+  register: deb_check
+
+- name: Execute script if nginx is not installed
+  fail: msg="Nginx could not be detected. It is required to be installed."
+  when: deb_check.stdout.find('no packages found') != -1
+
+- name: Generate username
+  command: 'sh -c "printf "%s:" "{{ auth_username }}" >> /etc/nginx/.htpasswd"'
+
+- name: Generate password
+  command: 'sh -c "echo "{{ auth_password }}" | openssl passwd -apr1 -stdin >> /etc/nginx/.htpasswd"'
+
+- name: Append newline to htpasswd
+  command: 'sh -c "printf "\n" >> /etc/nginx/.htpasswd"'
+
+- name: Add auth lines to nginx conf
+  lineinfile: dest="{{ auth_nginx_conf }}"
+              line={{ item.line }}
+              insertafter={{ item.insertafter }}
+              state=present
+  with_items:
+    - { line: 'auth_basic "Restricted Content";', insertafter: '\s?try_files \$uri \$uri' }
+    - { line: 'auth_basic_user_file /etc/nginx/.htpasswd;', insertafter: 'auth_basic "Restricted Content";' }
+  notify:
+    - restart php-fpm
+    - restart nginx
+
+- name: Check if php-fpm exists
+  stat: path=/etc/init.d/php-fpm
+  register: service_status
