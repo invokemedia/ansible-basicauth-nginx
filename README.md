@@ -6,7 +6,9 @@ Ansible Letsencrypt Nginx
 Requirements
 ------------
 
-This role assumes you already have Nginx installed. It also assumes you have a line in your Nginx conf like `try_files $uri $uri`.
+This role assumes you already have Nginx installed.
+
+It also assumes you have a line in your Nginx conf like `try_files $uri $uri`. Then it will append below that line, the basic auth settings.
 
 Installation
 ------------
@@ -59,4 +61,4 @@ Author Information
 References
 ----------
 
-* [certbot installation docs](https://certbot.eff.org/#ubuntuxenial-nginx)
+None.
